@@ -55,7 +55,7 @@
         
 
         var joinRoom = function(){
-            var url = "/Chat/JoinRoom/" + _connectionId + "/@Model.Name"
+            var url = "/Chat/JoinRoom/" + _connectionId + "/@Model.Id"
             axios.post(url, null)
                 .then(res => {
                     console.log("Room Joined!", res);
@@ -81,6 +81,7 @@
             event.preventDefault();
 
             var data = new FormData(event.target);
+            document.getElementById('message-input').value = '';
             axios.post("/Chat/SendMessage", data)
                 .then(res => {
                     console.log("Message Sent!");

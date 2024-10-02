@@ -48,7 +48,12 @@ namespace MyChatApp.Controllers
             ctx.Messages.Add(Message);
             await ctx.SaveChangesAsync();
             await _chat.Clients.Group(roomName)
-                .SendAsync("ReceiveMessage", Message);
+                .SendAsync("ReceiveMessage", new
+                {
+                    Text = Message.Text,
+                    Name = Message.UserName,
+                    TimeStamp = Message.Timestamp.ToString("dd/MM/yyyy hh:mm:ss")
+                });
             return Ok();
         }
     }
