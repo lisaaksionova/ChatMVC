@@ -9,6 +9,6 @@ namespace MyChatApp.Models
 
         public int ChatId { get; set; }
         public Chat Chat { get; set; }
-        public UserRole UserRole { get; set; }
+        public UserRole Role { get; set; }
     }
 }

@@ -1,45 +1,55 @@
-﻿<!DOCTYPE html>
+﻿
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - MyChatApp</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/MyChatApp.styles.css" asp-append-version="true" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>ChatApp</title>
+
+    <link rel="stylesheet" href="~/css/site.css">
+
 </head>
+
 <body>
+
     <div class="navbar">
         <a asp-controller="Home" asp-action="Index">Home</a>
         <a asp-controller="Home" asp-action="Find">Find</a>
         <a asp-controller="Home" asp-action="Private">Private</a>
     </div>
+
     <div class="main">
-       @* <vc:room></vc:room> *@
         @if (User.Identity.IsAuthenticated)
         {
-            @await Component.InvokeAsync("Room")
+            @* <vc:room></vc:room> *@
+            @if (User.Identity.IsAuthenticated)
+            {
+                @await Component.InvokeAsync("Room")
+            }
         }
-       
         <div class="chat">
             @RenderBody()
         </div>
     </div>
+
     <div class="modal" id="create-room-modal">
-        
         <form asp-controller="Home" asp-action="CreateRoom" class="modal-body">
             <button type="button" class="close" onclick="closeModal()">X</button>
             <header>Create Room</header>
             <div>
-                <input name="name"/>
+                <input name="name">
             </div>
             <footer>
                 <button>Create</button>
             </footer>
         </form>
     </div>
+
     <script src="~/js/site.js"></script>
     @RenderSection("Scripts", false)
 
 </body>
+
 </html>

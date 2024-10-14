@@ -1,28 +1,29 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
 using MyChatApp.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MyChatApp.Controllers
 {
     public class AccountController : Controller
     {
-        private SignInManager<User> _signInManager;
         private UserManager<User> _userManager;
+        private SignInManager<User> _signInManager;
 
         public AccountController(
             UserManager<User> userManager,
             SignInManager<User> signInManager)
         {
-            _signInManager = signInManager;
             _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         [HttpGet]
         public IActionResult Login() => View();
         [HttpPost]
+
         public async Task<IActionResult> Login(string username, string password)
         {
-            //todo login
             var user = await _userManager.FindByNameAsync(username);
 
             if (user != null)
@@ -31,20 +32,21 @@ namespace MyChatApp.Controllers
 
                 if (result.Succeeded)
                 {
-                    Console.WriteLine("Successfull login");
                     return RedirectToAction("Index", "Home");
-                   
                 }
             }
-            Console.WriteLine("login failed");
+
             return RedirectToAction("Login", "Account");
         }
+
         [HttpGet]
         public IActionResult Register() => View();
         [HttpPost]
+
         public async Task<IActionResult> Register(string username, string password)
         {
-            var user = new User { 
+            var user = new User
+            {
                 UserName = username
             };
 
@@ -53,12 +55,13 @@ namespace MyChatApp.Controllers
             if (result.Succeeded)
             {
                 await _signInManager.SignInAsync(user, false);
-                Console.WriteLine("successful register");
+
                 return RedirectToAction("Index", "Home");
             }
-            Console.WriteLine("register failed");
+
             return RedirectToAction("Register", "Account");
         }
+
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();

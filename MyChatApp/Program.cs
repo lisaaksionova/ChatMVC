@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyChatApp.Database;
 using MyChatApp.Hubs;
+using MyChatApp.Infrastructure.Repository;
 using MyChatApp.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +23,7 @@ builder.Services.AddIdentity<User, IdentityRole>(opts =>{
     .AddDefaultTokenProviders();
 
 builder.Services.AddSignalR();
+builder.Services.AddTransient<IChatRepository, ChatRepository>();
 
 var app = builder.Build();
 

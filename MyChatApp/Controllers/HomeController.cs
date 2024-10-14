@@ -1,117 +1,92 @@
+using System;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using MyChatApp.Database;
+using MyChatApp.Hubs;
+using MyChatApp.Infrastructure;
+using MyChatApp.Infrastructure.Repository;
+using MyChatApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using MyChatApp.Database;
-using MyChatApp.Models;
-using System;
-using System.Diagnostics;
-using System.Globalization;
-using System.Security.Claims;
+
 
 namespace MyChatApp.Controllers
 {
     [Authorize]
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
-        private AppDbContext _ctx;
-        public HomeController(AppDbContext ctx) => _ctx = ctx;
+        private IChatRepository _repo;
+        public HomeController(IChatRepository repo) => _repo = repo;
         public IActionResult Index()
         {
-            var chats = _ctx.Chats
-                .Include(x=>x.Users)
-                .Where(x=>!x.Users
-                .Any(y=>y.UserId == User.FindFirst(ClaimTypes.NameIdentifier).Value))
-                .ToList();
+            var chats = _repo.GetChats(GetUserId());
+
             return View(chats);
         }
 
-        public IActionResult Find()
+        public IActionResult Find([FromServices] AppDbContext ctx)
         {
-            var users = _ctx.Users
-                .Where(x => x.Id != User.FindFirst(ClaimTypes.NameIdentifier).Value)
+            var users = ctx.Users
+                .Where(x => x.Id != User.GetUserId())
                 .ToList();
+
             return View(users);
         }
+
         public IActionResult Private()
         {
-            var chats = _ctx.Chats
-                .Include(x => x.Users)
-                .ThenInclude(x=>x.User)
-                .Where(x => x.Type == ChatType.Private
-                && x.Users.Any(y => y.UserId == User.FindFirst(ClaimTypes.NameIdentifier).Value))
-                .ToList();
+            var chats = _repo.GetPrivateChats(GetUserId());
+
             return View(chats);
         }
+
         public async Task<IActionResult> CreatePrivateRoom(string userId)
         {
-            var chat = new Chat
-            {
-                Name = userId,
-                Type = ChatType.Private
-            };
-            chat.Users.Add(new ChatUser
-            {
-                UserId = userId
-            });
-            chat.Users.Add(new ChatUser
-            {
-                UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value
-            });
-            _ctx.Chats.Add(chat);
-            await _ctx.SaveChangesAsync();
-            return RedirectToAction("Chat", new {id = chat.Id});
+            var id = await _repo.CreatePrivateRoom(GetUserId(), userId);
+
+            return RedirectToAction("Chat", new { id });
         }
+
         [HttpGet("{id}")]
         public IActionResult Chat(int id)
         {
-            var chat = _ctx.Chats
-                .Include(x=>x.Messages)
-                .FirstOrDefault(x => x.Id == id);
-            return View(chat);
-        }
-        [HttpGet]
-        public async Task<IActionResult> JoinRoom(int id)
-        {
-            var chatUser = new ChatUser
-            {
-                ChatId = id,
-                UserRole = UserRole.Member,
-                UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value
-            };
-            _ctx.ChatUsers.Add(chatUser);
-            await _ctx.SaveChangesAsync();
-            return RedirectToAction("Chat", "Home", new { id = id });
+            return View(_repo.GetChat(id));
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateRoom(string name)
         {
-            var chat = new Chat
-            {
-                Name = name,
-                Type = ChatType.Room
-            };
-            chat.Users.Add(new ChatUser
-            {
-                UserRole = UserRole.Admin,
-                UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value
-            });
-            _ctx.Chats.Add(chat);
-            await _ctx.SaveChangesAsync();
+            await _repo.CreateRoom(name, GetUserId());
             return RedirectToAction("Index");
         }
-        [HttpPost]
-        public async Task<IActionResult> CreateMessage(int chatId, string message)
+
+        [HttpGet]
+        public async Task<IActionResult> JoinRoom(int id)
         {
-            _ctx.Messages.Add(new Message
-            {
-                ChatId = chatId,
-                Text = message,
-                Timestamp = DateTime.Now,
-                UserName = User.Identity.Name
-            });
-            await _ctx.SaveChangesAsync();
-            return RedirectToAction("Chat", new {id=chatId});
+            await _repo.JoinRoom(id, GetUserId());
+
+            return RedirectToAction("Chat", "Home", new { id = id });
+        }
+
+        public async Task<IActionResult> SendMessage(
+            int roomId,
+            string message,
+            [FromServices] IHubContext<ChatHub> chat)
+        {
+            var Message = await _repo.CreateMessage(roomId, message, User.Identity.Name);
+
+            await chat.Clients.Group(roomId.ToString())
+                .SendAsync("RecieveMessage", new
+                {
+                    Text = Message.Text,
+                    Name = Message.Name,
+                    Timestamp = Message.Timestamp.ToString("dd/MM/yyyy hh:mm:ss")
+                });
+
+            return Ok();
         }
     }
 }
