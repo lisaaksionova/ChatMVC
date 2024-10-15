@@ -83,7 +83,7 @@ namespace MyChatApp.Controllers
                 {
                     Text = Message.Text,
                     Name = Message.Name,
-                    Timestamp = Message.Timestamp.ToString("dd/MM/yyyy hh:mm:ss")
+                    Timestamp = Message.Timestamp.ToString("hh:mm")
                 });
 
             return Ok();

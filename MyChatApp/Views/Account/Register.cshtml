@@ -1,8 +1,21 @@
 ﻿
-<div>
-    <form asp-controller="Account" asp-action="Register">
-        <input type="text" name="username" placeholder="Username">
-        <input type="password" name="password" placeholder="Password">
-        <button type="submit">Register</button>
-    </form>
+<div class="container mt-5 pt-5">
+    <div class="row">
+        <div class="col-12 col-sm-7 col-md-6 m-auto">
+            <div class="card border-0 shadow">
+                <div class="card-body">
+                    <form asp-controller="Account" asp-action="Register">
+                        <input type="text" class="form-control my-4 py-2" name="username" placeholder="Username">
+                        <input type="password" class="form-control my-4 py-2" name="password" placeholder="Password">
+                        <div class="text-center mt-3">
+                            <button class="btn btn-primary" type="submit">Register</button>
+                            <a asp-controller="Account" asp-action="Login" class="nav-link">Already have an account ?</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+

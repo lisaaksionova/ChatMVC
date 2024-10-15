@@ -6,14 +6,14 @@
         <div class="message">
             <header>@message.Name:</header>
             <p>@message.Text</p>
-            <footer>@message.Timestamp</footer>
+            <footer>@message.Timestamp.ToString("hh:mm")</footer>
         </div>
     }
 </div>
-<form class="chat-input" onsubmit="sendMessage(event)" asp-controller="Home" asp-action="CreateMessage">
+<form class="chat-input bg-dark" onsubmit="sendMessage(event)" asp-controller="Home" asp-action="CreateMessage">
     <input type="hidden" name="roomId" value="@Model.Id">
     <input type="text" name="message" id="message-input">
-    <button type="submit">Send</button>
+    <button class="btn btn-outline-info" type="submit">Send</button>
 </form>
 
 @section scripts {

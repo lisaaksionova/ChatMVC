@@ -34,8 +34,12 @@ namespace MyChatApp.Infrastructure.Repository
 
         public async Task<int> CreatePrivateRoom(string rootId, string targetId)
         {
+            var targetUser = await _ctx.Users.FirstOrDefaultAsync(u=>u.Id == targetId);
+            var rootUser = await _ctx.Users.FirstOrDefaultAsync(u => u.Id == rootId);
+
             var chat = new Chat
             {
+                Name = $"{rootUser.UserName}To{targetUser.UserName}",
                 Type = ChatType.Private
             };
 
