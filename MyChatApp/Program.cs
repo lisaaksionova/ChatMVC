@@ -24,6 +24,14 @@ builder.Services.AddIdentity<User, IdentityRole>(opts =>{
 
 builder.Services.AddSignalR();
 builder.Services.AddTransient<IChatRepository, ChatRepository>();
+builder.Services.AddCors(opts =>
+{
+    opts.AddDefaultPolicy(builder =>
+    builder.WithOrigins("http://localhost:3000")
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+    .AllowCredentials());
+});
 
 var app = builder.Build();
 
@@ -39,6 +47,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseCors();
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -53,5 +62,7 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapHub<ChatHub>("/chatHub");
 });
+
+app.MapControllers();
 
 app.Run();
