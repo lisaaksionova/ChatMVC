@@ -52,19 +52,19 @@ function stopSentiment() {
 function displaySentiment(sentiment) {
     switch (sentiment) {
         case "positive":
-            inputField.style.backgroundColor = "green";
+            inputField.style.backgroundColor = "#90EE90";
             submitBtn.style.opacity = 1;
             submitBtn.style.cursor = "pointer"; // Use "pointer" for clickable
             submitBtn.disabled = false; // Enable the button
             break;
         case "negative":
-            inputField.style.backgroundColor = "red";
+            inputField.style.backgroundColor = "#F08080";
             submitBtn.style.opacity = 0.6;
             submitBtn.style.cursor = "not-allowed"; // Not clickable
             submitBtn.disabled = true; // Disable the button
             break;
         case "neutral":
-            inputField.style.backgroundColor = "yellow";
+            inputField.style.backgroundColor = "#FFFFE0";
             submitBtn.style.opacity = 1;
             submitBtn.style.cursor = "pointer"; // Use "pointer" for clickable
             submitBtn.disabled = false; // Enable the button
